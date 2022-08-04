@@ -1,8 +1,11 @@
-mod settings;
+use macroquad::prelude::*;
+
 mod player;
 
-use settings::*;
 use player::Player;
+
+pub const TILE_SIZE: f32 = 25f32;
+pub const MOVE_SPEED: f32 = 25f32;
 
 fn create_window_conf() -> Conf {
     Conf {
@@ -17,46 +20,40 @@ fn create_window_conf() -> Conf {
 
 #[macroquad::main(create_window_conf())]
 async fn main() {
-    request_new_screen_size(500f32, 500f32);
-    let mut player = Player{coords: vec![screen_width()*0.5f32-TILE_SIZE*0.5f32, screen_height()*0.5f32-TILE_SIZE*0.5f32], w: TILE_SIZE, h: TILE_SIZE, dir: vec![1f32, 0f32], colour: RED};
+    // Creating Player "Class"
+    let mut player = Player::new(TILE_SIZE*4f32, (screen_width()/TILE_SIZE/2f32-1f32)*TILE_SIZE, RED);
+    // Creating Input Vector
+    let mut input = vec![1f32, 0f32];
+    // Creating Frame Variables
+    let mut minimum_frame_time: f32;
+    let mut frame_time: f32;
+    let mut time_to_sleep = 0f32;
+
     loop {
         
         clear_background(BLACK);
         
-        let keys = vec![is_key_down(KeyCode::Up), is_key_down(KeyCode::Down), is_key_down(KeyCode::Left), is_key_down(KeyCode::Right)];
-        //TODO: make this 2d vector and finish match statement
-        player.dir = match keys {
-            
-            _ => vec![1f32, 0f32]
-        };
-
-        for (i, key) in keys.iter().enumerate() {
-            if *key{
-                if i == 0 {
-                    player.dir = vec![-1f32, 0f32];
-                } else if i == 1 {
-                    player.dir = vec![1f32, 0f32];
-                } else if i == 2 {
-                    player.dir = vec![0f32, -1f32];
-                } else{
-                    player.dir = vec![0f32, 1f32];
-                }
-            } 
+        if is_key_down(KeyCode::Right){
+            input = vec![1f32, 0f32];
+        } else if is_key_down(KeyCode::Down){
+            input = vec![0f32, 1f32];
+        } else if is_key_down(KeyCode::Left){
+            input = vec![-1f32, 0f32];
+        }else if is_key_down(KeyCode::Up){
+            input = vec![0f32, -1f32];
         }
-
-        player.mv();
+        
+        
+        player.dir = input.clone();
+        // player.mv();
         player.draw();
 
-        // println!("{}", 1. / 6.);
-        let minimum_frame_time = 1. / 7.; // 8 FPS
-        let frame_time = get_frame_time();
-        // println!("Frame time: {}ms", frame_time * 1000.);
-        if frame_time < minimum_frame_time {
-            let time_to_sleep = (minimum_frame_time - frame_time) * 1000.;
-            // println!("Sleep for {}ms", time_to_sleep);
-            std::thread::sleep(std::time::Duration::from_millis(time_to_sleep as u64));
-        }
+        minimum_frame_time = 1. / 7.; // 7 FPS
+        frame_time = get_frame_time()-time_to_sleep*0.001f32;
+        time_to_sleep = (minimum_frame_time - frame_time) * 1000.;
+        std::thread::sleep(std::time::Duration::from_millis(time_to_sleep as u64));
 
+        
         next_frame().await
     }
 }
