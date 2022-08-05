@@ -33,7 +33,7 @@ fn play(player: &mut Player, input: &Vec<f32>, score: &mut f32, frame_rect: &mut
             // Drawing Top Border
             draw_rectangle(0f32, 0f32, screen_width(), 24f32, BLACK);
             draw_line(0f32, 24f32, screen_width(), 24f32, 2f32, WHITE);
-            draw_text_ex(text.as_str(), 0f32, 20f32, TextParams { font: *font, font_size: 25u16, font_scale: 1f32, font_scale_aspect: 1f32, color: WHITE });
+            draw_text_ex(text.as_str(), 0f32, 20f32, TextParams { font: *font, font_size: 22u16, font_scale: 1f32, font_scale_aspect: 1f32, color: WHITE });
         }
     }
     game_state_clone
@@ -64,7 +64,7 @@ fn start(font: &Font) -> GameState {
 
     GameState::Start
 }
-//TODO change font
+
 // Creating a Function for the Gameover Game Status
 fn gameover(score: f32, font: &Font) -> GameState {
     // Checking to See if the Space key or Left mouse button is pressed and then Returning Setup Game State
@@ -99,12 +99,12 @@ fn pause(score: f32, font: &Font) -> GameState{
     let score_text = format!("Score: {}", score);
 
     // Finding Text Measurements and Settings them To Variables
-    let unpause_text_dimension = measure_text("Press Space or Click to Unpause", Some(*font), 30u16, 1f32);
-    let score_text_dimension = measure_text(score_text.as_str(), Some(*font), 31u16, 1f32);
+    let unpause_text_dimension = measure_text("Press Space or Click to Unpause", Some(*font), 25u16, 1f32);
+    let score_text_dimension = measure_text(score_text.as_str(), Some(*font), 26u16, 1f32);
 
     // Drawing Text Sections
-    draw_text_ex("Press Space or Click to Unpause", screen_width()*0.5f32-(unpause_text_dimension.width*0.5f32), screen_height()*0.5f32-(unpause_text_dimension.height*0.5f32), TextParams { font: *font, font_size: 35u16, font_scale: 1f32, font_scale_aspect: 1f32, color: WHITE });
-    draw_text_ex(score_text.as_str(), screen_width()*0.5f32-(score_text_dimension.width*0.5f32), screen_height()*0.5f32+score_text_dimension.height-4.5f32, TextParams { font: *font, font_size: 31u16, font_scale: 1f32, font_scale_aspect: 1f32, color: WHITE });
+    draw_text_ex(score_text.as_str(), screen_width()*0.5f32-(score_text_dimension.width*0.5f32), screen_height()*0.5f32-score_text_dimension.height-17f32, TextParams { font: *font, font_size: 26u16, font_scale: 1f32, font_scale_aspect: 1f32, color: WHITE });
+    draw_text_ex("Press Space or Click to Unpause", screen_width()*0.5f32-(unpause_text_dimension.width*0.5f32), screen_height()*0.5f32-(unpause_text_dimension.height*0.5f32), TextParams { font: *font, font_size: 25u16, font_scale: 1f32, font_scale_aspect: 1f32, color: WHITE });
 
     GameState::Pause
 }
@@ -141,10 +141,7 @@ async fn main() {
     let mut frame_time: f32;
     let mut time_to_sleep = 0f32;
 
-    let font = match load_ttf_font("./font/Roboto-Regular.ttf").await {
-        Ok(font) => font,
-        Err(err) => panic!("Failed to load font. Error: {}", err)
-    };
+    let font = load_ttf_font("./font/Roboto-Regular.ttf").await.unwrap();
 
     loop {
         // Making the Window all Black
